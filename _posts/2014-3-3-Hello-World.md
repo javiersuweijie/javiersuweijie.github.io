@@ -1,10 +1,28 @@
 ---
 layout: post
-title: You're up and running!
+title: Notes on Lazada Product Title Challenge
 ---
 
-Next you can update your site name, avatar and other options using the _config.yml file in the root of your repository (shown below).
+##Overview##
+##Approach##
+Looking through a few of the submissions on Kaggle, most winning entries use a variation of an ensemble method. I refered to the following papers to formulate a quick plan on a few models to test on.
+1. A
+2. B
+3. C
+4. D
 
-![_config.yml]({{ site.baseurl }}/images/config.png)
+##Data Exploration##
+The advice I received on starting a data science project was to understand the data set. The following was the given set of data and a few examples of each of the rows.
 
-The easiest way to make your first post is to edit this one. Go into /_posts/ and update the Hello World markdown file. For more instructions head over to the [Jekyll Now repository](https://github.com/barryclark/jekyll-now) on GitHub.
+---
+---
+
+Intuitively, it is not clear how some of the columns like price, country or shipping type would affect the clarity or conciseness of the product title. Using sklearn and pandas, I ran a simple logistic regression separately for each of the columns to validate my hypothesis.
+
+```python
+```
+
+
+
+##Models##
+##Results##
