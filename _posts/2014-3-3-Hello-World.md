@@ -3,24 +3,53 @@ layout: post
 title: Notes on Lazada Product Title Challenge
 ---
 
-##Overview##
-##Approach##
-Looking through a few of the submissions on Kaggle, most winning entries use a variation of an ensemble method. I refered to the following papers to formulate a quick plan on a few models to test on.
-1. A
-2. B
-3. C
-4. D
+## Overview
+### Approach
+Looking through a few of the submissions on Kaggle, most winning entries use a variation of an ensemble method. I refered some papers to formulate a quick plan on a few models to test on.
 
-##Data Exploration##
-The advice I received on starting a data science project was to understand the data set. The following was the given set of data and a few examples of each of the rows.
+### Data Exploration
+The advice I received on starting a data science project was to first understand the data set. The following was the given set of data and a few examples of each of the rows.
 
----
----
+Columns           | Description
+------------      | -------------
+country           | The country where the product is marketed, with three possible values: my for Malaysia, ph for Philippines, sg for Singapore
+sku_id            | Unique product id, e.g., "NO037FAAA8CLZ2ANMY"
+title             | Product title, e.g., "RUDY Dress"
+category_lvl_1    | General category that the product belongs to, e.g., "Fashion"
+category_lvl_2    | Intermediate category that the product belongs to, e.g., "Women"
+category_lvl_3    | Specific category that the product belongs to, e.g., "Clothing"
+short_description | Short description of the product, which may contain html formatting, e.g., "<ul> <li>Short Sleeve</li> <li>3 Colours 8 Sizes</li> <li>Dress</li> </ul> "
+price             | Price in the local currency, e.g., "33.0".  When country is my, the price is in Malaysian Ringgit.  When country is sg, the price is in Singapore Dollar.  When country is ph, the price is in Philippine Peso.
+product_type      | It could have three possible values: local means the product is delivered locally, international means the product is delivered from abroad, NA means not applicable.
 
-Intuitively, it is not clear how some of the columns like price, country or shipping type would affect the clarity or conciseness of the product title. Using sklearn and pandas, I ran a simple logistic regression separately for each of the columns to validate my hypothesis.
+Intuitively, it is not clear how some of the columns like price, country or shipping type would affect the clarity or conciseness of the product title. Using sklearn and pandas, I ran a simple logistic regression separately for each of the columns to validate my hypothesis. The dataset was heavy imbalanced with very little unclear titles. (the mean for clarity labels: 0.94, conciseness labels: 0.68) I oversampled the dataset to better balance the classes. 
 
 ```python
+ss = ShuffleSplit(1,0.8)
+for train, test in ss.split(training_bal):
+    for feature_names in ["price", "title_length", "short_description_length"]:
+        train_set = list(map(lambda x : [x[feature_names]], training_bal[train]))
+        test_set = list(map(lambda x : [x[feature_names]], training_bal[test]))
+
+        train_set_cl = clarity_bal[train]
+        train_set_co = conciseness_bal[train]
+
+        test_set_cl = clarity_bal[test]
+        test_set_co = conciseness_bal[test]
+        
+        model_cl = LogisticRegression().fit(train_set,train_set_cl)
+        model_co = LogisticRegression(class_weight='balanced').fit(train_set,train_set_co)
+
+        pred_cl = model_cl.predict(test_set)
+        pred_co = model_co.predict(test_set)
+        
+        print(feature_names)
+        print("clarity: %f" % np.sqrt(mean_squared_error(pred_cl, test_set_cl)))
+        print("conciseness: %f" % np.sqrt(mean_squared_error(pred_co, test_set_co)))
+        print()
 ```
+
+By themselves, these basic features are not good signals to predict either the clarity nor conciseness of a title. We will need to clean the data and use a little more advanced features to capture the structure of the titles as signals. For the cleaning of data, I refered to the following snippet of code. It is simple and works relatively well together with a list of 10000 common used words from Google. I edited a little to also resolve words that are joint together by mistake (e.g. blueshort -> blue & short). 
 
 
 
