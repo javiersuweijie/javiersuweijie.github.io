@@ -49,9 +49,19 @@ for train, test in ss.split(training_bal):
         print()
 ```
 
-By themselves, these basic features are not good signals to predict either the clarity nor conciseness of a title. We will need to clean the data and use a little more advanced features to capture the structure of the titles as signals. For the cleaning of data, I refered to the following snippet of code. It is simple and works relatively well together with a list of 10000 common used words from Google. I edited a little to also resolve words that are joint together by mistake (e.g. blueshort -> blue & short). 
+By themselves, these basic features doesn't seem like they are good enough signals to predict neither the clarity nor conciseness of a title. We will need to clean the data and use a little more advanced features to capture the structure of the titles as signals. For the cleaning of data, I refered to the following snippet of code. It is simple and works relatively well together with a list of 10000 common used words from Google. I modified it to also resolve words that are joint together by mistake (e.g. blueshort -> blue & short). I realised that a lot of the titles have either model/serial numbers and dimensions. To reduce the size of the feature space in the later models, all words with numerics were replaced with a `#` symbol. 
+
+## Models
+
+### N-grams based TF-IDF with Ridge Regression, K-Nearest Neighbours, Random Forests, Gradient Boosting
+After cleaning the data, I used a simple TF-IDF based model to vectorise each title. The result is a large sparse matrix that models how important each n-gram term is in relation to both the document (title) and the entire corpus. To reduce the size of the matrix, only the top 16th percentile was chosen after using chi-squared test. For char 3-gram, the resulting width of the matrix was reduced from 26374 to 4220.
+
+I tested out with char 3,5,7,9-grams and word 1,3-grams. The following are the respective results. 
+
+Seems like we are on to something here. Next, I tried to do what most Kagglers do to beat the leaderboard... Stacking!
+
+I randomly split the dataset into 3. A(70%) B(20%) C(10%). Trained a few models on A, fed the outputs into a fully connected NN with 1 hidden layer and a (2,1) output. Then finally validating the predictions with C. The following are the results:
 
 
 
-##Models##
 ##Results##
