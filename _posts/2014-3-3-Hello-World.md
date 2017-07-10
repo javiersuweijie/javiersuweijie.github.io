@@ -60,27 +60,33 @@ I tested out with char 3,5,7,9-grams and word 1,3-grams. The following are the r
 
 
 feature set     | clarity (tf)  | conciseness (tf)  | clarity (tf-idf)  | conciseness (tf-idf) 
-------------    | ----------     | --------- |
-random baseline | 0.324347 | 0.654909 | 0.324347 | 0.654909
-char 3gram      | 0.402636 | 0.381939 | 0.410360 | 0.369954
-char 5gram      | 0.401437 | 0.366141 | 0.395779 | 0.357437
-char 7gram      | 0.414279 | 0.357683 | 0.386608 | 0.349552
-char 9gram      | 0.387128 | 0.358778 | 0.376302 | 0.361365
-word 1gram      | 0.393545 | 0.383846 | 0.410250 | 0.381326
-word 3gram      | 0.390756 | 0.406796 | 0.387831 | 0.414158
+------------    | ----------    | ---------         | --------------    | --------
+random baseline | 0.324347      | 0.654909          | 0.324347          | 0.654909
+char 3gram      | 0.402636      | 0.381939          | 0.410360          | 0.369954
+char 5gram      | 0.401437      | 0.366141          | 0.395779          | 0.357437
+char 7gram      | 0.414279      | 0.357683          | 0.386608          | 0.349552
+char 9gram      | 0.387128      | 0.358778          | 0.376302          | 0.361365
+word 1gram      | 0.393545      | 0.383846          | 0.410250          | 0.381326
+word 3gram      | 0.390756      | 0.406796          | 0.387831          | 0.414158
 
 It seems like this model did worst on the clarity than just randomly guessing. This is likely to do with having heavily imbalanced training set (90% of the titles were clear). In fact, by just predicting that titles are clear, we can get a score of 0.2379. However, for conciseness, it did way better than randomly guessing. 
 
-Next, I tried to do what most Kagglers do to beat the leaderboard... Stacking! I randomly split the dataset into three parts. A (70%) B (20%) C (10%). Firstly, by training a few models on A and predicting labels for B, I fed the B predictions into another Ridge Regression model that is trained on B. Then finally validating the B predictions with C. The results are promising with rmse of clarity at 0.221783 and conciseness at 0.338390. Running the pipeline with a cleaned data set gave an improvement to clarity (0.204356) but conciseness (0.338385) did not change much.
+Next, I tried to do what most Kagglers do to beat the leaderboard... Stacking! I randomly split the dataset into three parts. A (70%) B (20%) C (10%). 
 
-With my current instance on linode, K-Nearest Neighbour and SVM both either takes too long or runs out of memory. 
+Firstly, by training a few models on A and predicting labels for B, I fed the B predictions into another Ridge Regression model that is trained on the labels of B. Then finally validating the B predictions with C. The results are promising with rmse for clarity at **0.221783** and conciseness at **0.338390**. Running the pipeline with a cleaned data set gave an improvement to clarity (0.204356) but conciseness (0.338385) did not change much.
 
-I also tried using the inverse term frequency to weight the frequencies. Clarity scores increased but conciseness decreased. This kind of make sense as how rare a word is in the corpus should not affect how concise the title is. For example, 
+With my current instance on linode, K-Nearest Neighbour and SVM both either takes too long or runs out of memory too quickly. I tried to reduce the dimensionality of the sparse matrix with latent semantic analysis. This did not offer much improvement to the overall model. I also tried using the inverse term frequency to weight the frequencies. Clarity scores increased but conciseness decreased.
+
+I ended up training all the feature sets on both ridge regression and random forest, picked the top 8 best performing models to feed into an ensemble. 
 
 ### Long-Short Term Memory Network
 
-The n-gram model works great but it does not take semantics into account. Taking an unconcise title for example, `Women Canvas Navy Style ID Credit Card Bag Girls Coin Bags Purse (Orange)`, we see multiple mentions of the term `purse` but in different ways like `coin bag`, `card bag`. My hunch is that maybe using a better representation of words, we can capture these repeating concepts in a title. I downloaded a pre-trained GloVe model and ran it through a LSTM network with just 1 hidden layer. I decided to train both clarity and conciseness at the same thinking that the network will capture the relationships between the two labels.
+The n-gram model works great but it does not take semantics into account. Taking an unconcise title as an example, `Women Canvas Navy Style ID Credit Card Bag Girls Coin Bags Purse (Orange)`, we see multiple mentions of the term `purse` but in different ways like `coin bag`, `card bag`. My hunch is that maybe using a better representation of words, we can capture these repeating concepts in a title. I downloaded a pre-trained GloVe model and ran it through a LSTM network with just 1 hidden layer. I decided to train both clarity and conciseness at the same thinking that the network will capture the relationships between the two labels.
 
+The results were not spetacular but nevertheless it was close to the ridge regression model above. Changing the hyperparameters did not change the result by a large extent so I stuck with a hidden layer of 50 units. 
 
+### Convolution Neural Network
+
+- To be completed
 
 ##Results##
