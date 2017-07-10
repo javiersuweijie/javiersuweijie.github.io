@@ -24,32 +24,12 @@ product_type      | It could have three possible values: local means the product
 
 Intuitively, it is not clear how some of the columns like price, country or shipping type would affect the clarity or conciseness of the product title. Using sklearn and pandas, I ran a simple logistic regression separately for each of the columns to validate my hypothesis. The dataset was heavy imbalanced with very little unclear titles. (the mean for clarity labels: 0.94, conciseness labels: 0.68) I oversampled the dataset to better balance the classes. 
 
-```python
-ss = ShuffleSplit(1,0.8)
-for train, test in ss.split(training_bal):
-    for feature_names in ["price", "title_length", "short_description_length"]:
-        train_set = list(map(lambda x : [x[feature_names]], training_bal[train]))
-        test_set = list(map(lambda x : [x[feature_names]], training_bal[test]))
+By themselves, these basic features doesn't seem like they are good enough signals to predict neither the clarity nor conciseness of a title. I combined `price`, `title length`, `description length`, `categories 1,2,3` and ran a multi-dimension logistic regression. The result is as follows:
 
-        train_set_cl = clarity_bal[train]
-        train_set_co = conciseness_bal[train]
+* clarity: 0.242000
+* conciseness: 0.443594
 
-        test_set_cl = clarity_bal[test]
-        test_set_co = conciseness_bal[test]
-        
-        model_cl = LogisticRegression().fit(train_set,train_set_cl)
-        model_co = LogisticRegression(class_weight='balanced').fit(train_set,train_set_co)
-
-        pred_cl = model_cl.predict(test_set)
-        pred_co = model_co.predict(test_set)
-        
-        print(feature_names)
-        print("clarity: %f" % np.sqrt(mean_squared_error(pred_cl, test_set_cl)))
-        print("conciseness: %f" % np.sqrt(mean_squared_error(pred_co, test_set_co)))
-        print()
-```
-
-By themselves, these basic features doesn't seem like they are good enough signals to predict neither the clarity nor conciseness of a title. We will need to clean the data and use a little more advanced features to capture the structure of the titles as signals. For the cleaning of data, I refered to the following snippet of code. It is simple and works relatively well together with a list of 10000 common used words from Google. I modified it to also resolve words that are joint together by mistake (e.g. blueshort -> blue & short). I realised that a lot of the titles have either model/serial numbers and dimensions. To reduce the size of the feature space in the later models, all words with numerics were replaced with a `#` symbol. 
+We will need to clean the data and use a little more advanced features to capture the structure of the titles as signals. For the cleaning of data, I refered to the following snippet of code. It is simple and works relatively well together with a list of 10000 common used words from Google. I modified it to also resolve words that are joint together by mistake (e.g. blueshort -> blue & short). I realised that a lot of the titles have either model/serial numbers and dimensions. To reduce the size of the feature space in the later models, all words with numerics were replaced with a `#` symbol. 
 
 ## Models
 
@@ -79,7 +59,10 @@ With my current instance on linode, K-Nearest Neighbour and SVM both either take
 
 I ended up training all the feature sets on both ridge regression and random forest, picked the top 8 best performing models to feed into an ensemble. 
 
-Possible hypothesis to explore:
+* clarity: 0.204356
+* conciseness: 0.338385
+
+Possible things to explore:
 1. Comparing the title with the short description. If description contains something that the title does not have, maybe the title in unclear?
 2. Including categorical data as features. Possibily at the ensemble stage using a random forest.
 
@@ -88,6 +71,9 @@ Possible hypothesis to explore:
 The n-gram model works great but it does not take semantics into account. Taking an unconcise title as an example, `Women Canvas Navy Style ID Credit Card Bag Girls Coin Bags Purse (Orange)`, we see multiple mentions of the term `purse` but in different ways like `coin bag`, `card bag`. My hunch is that maybe by using a better representation of words, we can capture these repeating concepts in a title. I downloaded a pre-trained GloVe model and ran it through a LSTM network with just 1 hidden layer. I decided to train both clarity and conciseness at the same thinking that the network will capture the relationships between the two labels.
 
 The results were not spetacular but nevertheless it was close to the ridge regression model above. Changing the hyperparameters did not change the result by a large extent so I stuck with a hidden layer of 50 units. 
+
+* clarity: 0.2130
+* Conciseness: 0.3555
 
 ### Titles Pre-processing
 
@@ -98,7 +84,9 @@ After iteratively labelling 4000 titles (9% of the samples), I used the model to
 * clarity: 0.257165
 * concisness: 0.490752
 
-Although it did better than randomly guessing, 
+Although it did better than randomly guessing, it's not really that much better. Will have to come back to this again in the future as this seems like the best way to advice users on what type of information they are missing. 
+
+To do: Try including other features like category and length.
 
 ### Convolution Neural Network
 
