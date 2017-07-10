@@ -89,9 +89,16 @@ The n-gram model works great but it does not take semantics into account. Taking
 
 The results were not spetacular but nevertheless it was close to the ridge regression model above. Changing the hyperparameters did not change the result by a large extent so I stuck with a hidden layer of 50 units. 
 
-### Pre-processing the titles before feature extraction
+### Titles Pre-processing
 
-The hypothesis is that we can tag the words in the title to a certain class (e.g. product, model, specifications, brand...), we can then derive more information on how to label them. 
+I wanted to test if we can make use of some information by tagging the words in the title to a certain class (e.g. product, model, specifications, brand...), we can then derive more information on how to label them. After a quick research on training a POS tagger, I decided to build one using Conditional Random Fields. The idea is simple, predicting the state (class) of a token (a word in the title) by using the previous and next state together with some observable features like length of token, number of symbols, number of numericals and whether the word belonged to one of the 1000 commonly used words. I quickly hacked up a UI so that I can label the titles daily on my way to work. 
+
+After iteratively labelling 4000 titles (9% of the samples), I used the model to predict the classes the rest of the tokens. With this new feature set, I trained a RandomForest model to test signal strength in predicting the final labels. I counted the number of occurrence of each class and also how similar the product terms are to other product terms. WordNet similarity was used here. The results were a little disappointing.
+
+* clarity: 0.257165
+* concisness: 0.490752
+
+Although it did better than randomly guessing, 
 
 ### Convolution Neural Network
 
