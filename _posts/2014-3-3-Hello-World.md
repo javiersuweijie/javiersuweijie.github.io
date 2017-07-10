@@ -18,7 +18,7 @@ title             | Product title, e.g., "RUDY Dress"
 category_lvl_1    | General category that the product belongs to, e.g., "Fashion"
 category_lvl_2    | Intermediate category that the product belongs to, e.g., "Women"
 category_lvl_3    | Specific category that the product belongs to, e.g., "Clothing"
-short_description | Short description of the product, which may contain html formatting, e.g., "<ul> <li>Short Sleeve</li> <li>3 Colours 8 Sizes</li> <li>Dress</li> </ul> "
+short_description | Short description of the product, which may contain html formatting, e.g., `<ul> <li>Short Sleeve</li> <li>3 Colours 8 Sizes</li> <li>Dress</li> </ul>`
 price             | Price in the local currency, e.g., "33.0".  When country is my, the price is in Malaysian Ringgit.  When country is sg, the price is in Singapore Dollar.  When country is ph, the price is in Philippine Peso.
 product_type      | It could have three possible values: local means the product is delivered locally, international means the product is delivered from abroad, NA means not applicable.
 
@@ -79,11 +79,19 @@ With my current instance on linode, K-Nearest Neighbour and SVM both either take
 
 I ended up training all the feature sets on both ridge regression and random forest, picked the top 8 best performing models to feed into an ensemble. 
 
+Possible hypothesis to explore:
+1. Comparing the title with the short description. If description contains something that the title does not have, maybe the title in unclear?
+2. Including categorical data as features. Possibily at the ensemble stage using a random forest.
+
 ### Long-Short Term Memory Network
 
-The n-gram model works great but it does not take semantics into account. Taking an unconcise title as an example, `Women Canvas Navy Style ID Credit Card Bag Girls Coin Bags Purse (Orange)`, we see multiple mentions of the term `purse` but in different ways like `coin bag`, `card bag`. My hunch is that maybe using a better representation of words, we can capture these repeating concepts in a title. I downloaded a pre-trained GloVe model and ran it through a LSTM network with just 1 hidden layer. I decided to train both clarity and conciseness at the same thinking that the network will capture the relationships between the two labels.
+The n-gram model works great but it does not take semantics into account. Taking an unconcise title as an example, `Women Canvas Navy Style ID Credit Card Bag Girls Coin Bags Purse (Orange)`, we see multiple mentions of the term `purse` but in different ways like `coin bag`, `card bag`. My hunch is that maybe by using a better representation of words, we can capture these repeating concepts in a title. I downloaded a pre-trained GloVe model and ran it through a LSTM network with just 1 hidden layer. I decided to train both clarity and conciseness at the same thinking that the network will capture the relationships between the two labels.
 
 The results were not spetacular but nevertheless it was close to the ridge regression model above. Changing the hyperparameters did not change the result by a large extent so I stuck with a hidden layer of 50 units. 
+
+### Pre-processing the titles before feature extraction
+
+The hypothesis is that we can tag the words in the title to a certain class (e.g. product, model, specifications, brand...), we can then derive more information on how to label them. 
 
 ### Convolution Neural Network
 
