@@ -3,7 +3,8 @@ layout: post
 title: Notes on Lazada Product Title Challenge
 ---
 
-## Overview
+Lazada came up with a data science challenge to categorise their product titles. I joined the competition to get exposed to some experience in a data science project. This is my first time entering a competition like that and I'm quite excited to try all the different ways to tackle the problem. This blog post is to consolidate my thoughts about the project and to document my progress for future reference. Here we go.
+
 ### Approach
 Looking through a few of the submissions on Kaggle, most winning entries use a variation of an ensemble method. I refered some papers to formulate a quick plan on a few models to test on.
 
