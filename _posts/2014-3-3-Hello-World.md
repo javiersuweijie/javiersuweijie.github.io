@@ -68,10 +68,10 @@ Firstly, by training a few models on A and predicting labels for B, I fed the B 
 
 With my current instance on linode, K-Nearest Neighbour and SVM both either takes too long or runs out of memory too quickly. I tried to reduce the dimensionality of the sparse matrix with latent semantic analysis. This did not offer much improvement to the overall model. I also tried using the inverse term frequency to weight the frequencies. Clarity scores increased but conciseness decreased.
 
-I ended up training all the feature sets on both ridge regression and random forest, picked the top 8 best performing models to feed into an ensemble. 
+I ended up training all the feature sets on both ridge regression and random forest, picked the top 8 best performing models to feed into an ensemble. Although the split testing score was low, the score on the validation set was pretty bad.
 
-* clarity: 0.204356
-* conciseness: 0.338385
+* clarity: 0.21342
+* conciseness: 0.33056
 
 Possible things to explore:
 1. Comparing the title with the short description. If description contains something that the title does not have, maybe the title in unclear?
