@@ -75,6 +75,8 @@ The results were not spetacular but nevertheless it was close to the ridge regre
 * clarity: 0.2130
 * Conciseness: 0.3555
 
+To do: Feeding the LSTM output together with categorial features into another hidden layer.
+
 ### Titles Pre-processing
 
 I wanted to test if we can make use of some information by tagging the words in the title to a certain class (e.g. product, model, specifications, brand...), we can then derive more information on how to label them. After a quick research on training a POS tagger, I decided to build one using Conditional Random Fields. The idea is simple, predicting the state (class) of a token (a word in the title) by using the previous and next state together with some observable features like length of token, number of symbols, number of numericals and whether the word belonged to one of the 1000 commonly used words. I quickly hacked up a UI so that I can label the titles daily on my way to work. 
