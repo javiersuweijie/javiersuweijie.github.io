@@ -24,12 +24,23 @@ product_type      | It could have three possible values: local means the product
 
 Intuitively, it is not clear how some of the columns like price, country or shipping type would affect the clarity or conciseness of the product title. Using sklearn and pandas, I ran a simple logistic regression separately for each of the columns to validate my hypothesis. The dataset was heavy imbalanced with very little unclear titles. (the mean for clarity labels: 0.94, conciseness labels: 0.68) I oversampled the dataset to better balance the classes. 
 
+feature      | clarity  | conciseness
+---          | ---      | ---
+price        | 0.676383 | 0.680447
+title_length | 0.632987 | 0.552437
+short_description_length | 0.692496 | 0.700537
+country      | 0.692390 | 0.686330
+category 1   | 0.479342 | 0.578741
+category 2   | 0.490488 | 0.591455
+category 3   | 0.473209 | 0.559848
+
+
 By themselves, these basic features doesn't seem like they are good enough signals to predict neither the clarity nor conciseness of a title. I combined `price`, `title length`, `description length`, `categories 1,2,3` and ran a multi-dimension logistic regression. The result is as follows:
 
-* clarity: 0.242000
-* conciseness: 0.443594
+* clarity: 0.473671
+* conciseness: 0.484296
 
-We will need to clean the data and use a little more advanced features to capture the structure of the titles as signals. For the cleaning of data, I refered to the following snippet of code. It is simple and works relatively well together with a list of 10000 common used words from Google. I modified it to also resolve words that are joint together by mistake (e.g. blueshort -> blue & short). I realised that a lot of the titles have either model/serial numbers and dimensions. To reduce the size of the feature space in the later models, all words with numerics were replaced with a `#` symbol. 
+Since most of the features cannot really give us information on the labels, we will need to clean the data and use a little more advanced features to capture the structure of the titles as signals. For the cleaning of data, I refered to the following snippet of code. It is simple and works relatively well together with a list of 10000 common used words from Google. I modified it to also resolve words that are joint together by mistake (e.g. blueshort -> blue & short). I realised that a lot of the titles have either model/serial numbers and dimensions. To reduce the size of the feature space in the later models, all words with numerics were replaced with a `#` symbol. 
 
 ## Models
 
