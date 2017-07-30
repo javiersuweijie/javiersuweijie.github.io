@@ -91,14 +91,14 @@ From the data exploratory phase, I found out that categories play some role in p
 
 ![LSTM with categories](https://raw.githubusercontent.com/javiersuweijie/javiersuweijie.github.io/master/images/lstm-2.png)
 
-* clarity: 0.211
-* Conciseness: 0.354
+* clarity: 0.206639
+* Conciseness: 0.333616
 
-Although it didn't do as well on the split testing evaluation, this model performed the best so far on the validation set. 
+This model performed the best so far on the validation set. 
 
 Possible things to explore:
 1. Compare the performance with a tuned Bi-directional LSTM.
-2. Use embeddings with a larger dimension. I wasn't able to try 
+2. Use embeddings with a larger dimension. I wasn't able to try due to a lack of memory.
 
 ### Titles Pre-processing
 
@@ -113,7 +113,9 @@ After iteratively labelling 4000 titles (9% of the samples), I used the model to
 
 Although it did better than randomly guessing, it's not really that much better. Will have to come back to this again in the future as this seems like the best way to advice users on what type of information they are missing. 
 
-To do: Try including other features like category and length.
+Possible things to explore:
+1. Try including other features like category and length.
+2. Regularise some of the terms such as colours, brands and sizes before training the CRF model.
 
 ### Convolution Neural Network
 
@@ -123,6 +125,9 @@ I also tried to experiment between static and non-static embeddings. Again, like
 
 * clarity: 0.212603
 * conciseness: 0.337787
+
+Possible things to explore:
+1. Deeper network with more regularisation/dropouts to reduce overfitting.
 
 ### Final Results
 
