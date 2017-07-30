@@ -69,7 +69,7 @@ Firstly, by training a few models on A and predicting labels for B, I fed the B 
 
 With my current instance on linode, K-Nearest Neighbour and SVM both either takes too long or runs out of memory too quickly. I tried to reduce the dimensionality of the sparse matrix with latent semantic analysis. This did not offer much improvement to the overall model. I also tried using the inverse term frequency to weight the frequencies. Clarity scores increased but conciseness decreased.
 
-I ended up training all the feature sets on both ridge regression and random forest, picked the top 8 best performing models to feed into an ensemble. Although the split testing score was low, the score on the validation set was pretty bad.
+I ended up training all the feature sets on both ridge regression and random forest, picked the top 8 best performing models to feed into an ensemble. Although the split testing score was good, the score on the validation set was pretty bad.
 
 * clarity: 0.21342
 * conciseness: 0.33056
@@ -82,10 +82,10 @@ Possible things to explore:
 
 The n-gram model works great but it does not take semantics into account. Taking an unconcise title as an example, `Women Canvas Navy Style ID Credit Card Bag Girls Coin Bags Purse (Orange)`, we see multiple mentions of the term `purse` but in different ways like `coin bag`, `card bag`. My hunch is that maybe by using a better representation of words, we can capture these repeating concepts in a title. I downloaded a pre-trained GloVe model and ran it through a LSTM network with just 1 hidden layer. I decided to train both clarity and conciseness at the same thinking that the network will capture the relationships between the two labels.
 
-The results were not spetacular but nevertheless it was close to the ridge regression model above. Changing the hyperparameters did not change the result by a large extent so I stuck with a hidden layer of 50 units. 
+The results were not spectacular but nevertheless it was close to the ridge regression model above. Changing the hyperparameters did not change the result by a large extent so I stuck with a hidden layer of 50 units. 
 
 * clarity: 0.2130
-* Conciseness: 0.3555
+* conciseness: 0.3555
 
 From the data exploratory phase, I found out that categories play some role in predicting clarity. I decided to incorporate this information into a more complex network. I used keras to generate the following diagram.
 
@@ -95,6 +95,10 @@ From the data exploratory phase, I found out that categories play some role in p
 * Conciseness: 0.354
 
 Although it didn't do as well on the split testing evaluation, this model performed the best so far on the validation set. 
+
+Possible things to explore:
+1. Compare the performance with a tuned Bi-directional LSTM.
+2. Use embeddings with a larger dimension. I wasn't able to try 
 
 ### Titles Pre-processing
 
@@ -113,6 +117,24 @@ To do: Try including other features like category and length.
 
 ### Convolution Neural Network
 
-- To be completed
+The last model I tried was a simple convolution neural network. I read a few papers on how CNNs worked well for sentence classification problems. Intuitively, due to the effectives of representing locality information, CNNs can capture the relationships of a string of words well. Using a similar approach to the RNN model, I used GloVe to generate the word embeddings. The next layers are 3,4,5 wide filters followed by 1-max-pooling. These configurations were recommended by [this paper](https://arxiv.org/abs/1510.03820) and they do work well. However, instead of using 100 filter maps as recommended, I only used 4 for each filter. I realised that the model tends to overfit with this dataset and reducing the number of parameters actually help to improve the validation scores significantly. 
 
-##Results##
+I also tried to experiment between static and non-static embeddings. Again, likely due to overfitting, the non-static embeddings did slightly worse on the cross validation. The CNN model trains a lot faster than the RNN model and I would definitely try it right from the get go in the future. Lastly, I also decided to train clarity and conciseness on two different models. Because of the smaller number of parameters, the model likely couldn't fit both classes at once. Since the model trains fast, splitting into two wasn't that painful. The following are the validation scores for the CNN model.
+
+* clarity: 0.212603
+* conciseness: 0.337787
+
+### Final Results
+
+At this point in time, I realised I have spent too much time on this competition. I decided to average the two predictions from the LSTM and CNN models for the final submission. Although I did not make to top 10, considering that this was my first "Kaggle" competition I think I learnt quite a lot. Will definitely participate in others after this to improve my intuition when it comes to data and language problems. 
+
+Tools that I used:
+1. AWS GPU Compute Instances - Highly recommend for laptop users like myself. Together with a configured image, I can spin up and run experiements in minutes.
+2. Jupyter - Also another highly recommended tool when working with AWS instances.
+3. sklearn - Enough said.
+4. python-crftools - Conditional random field implementation wrapper for python
+5. keras with tensorflow - Deep learning in less than 20 lines of code.
+
+Final Rank: 
+* clarity:
+* conciseness: 
